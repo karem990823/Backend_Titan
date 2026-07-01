@@ -176,3 +176,64 @@ def obtener_calendario(db: Session):
         # Esto te dirá el error exacto en la terminal si vuelve a fallar
         print(f"Error en calendario: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
+    
+
+def actualizar_programacion(db: Session, id_programacion: int, data):
+
+    programacion = db.query(ProgramacionCurso).filter(
+        ProgramacionCurso.id_programacion == id_programacion
+    ).first()
+
+    if not programacion:
+        raise HTTPException(
+            status_code=404,
+            detail="Programación no encontrada"
+        )
+
+
+    programacion.id_curso = data.id_curso
+    programacion.id_usuario = data.id_usuario
+    programacion.fecha = data.fecha
+    programacion.hora = data.hora
+    programacion.cupos = data.cupos
+
+
+    db.commit()
+    db.refresh(programacion)
+
+
+    return api_response(
+        success=True,
+        message="Programación actualizada",
+        data={
+            "id_programacion": programacion.id_programacion
+        }
+    )
+
+
+
+def eliminar_programacion(db: Session, id_programacion: int):
+
+    programacion = db.query(ProgramacionCurso).filter(
+        ProgramacionCurso.id_programacion == id_programacion
+    ).first()
+
+
+    if not programacion:
+        raise HTTPException(
+            status_code=404,
+            detail="Programación no encontrada"
+        )
+
+
+    db.delete(programacion)
+    db.commit()
+
+
+    return api_response(
+        success=True,
+        message="Programación eliminada",
+        data={
+            "id_programacion": id_programacion
+        }
+    )

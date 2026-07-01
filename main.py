@@ -2,6 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from App.Modulo_Cursos.routes import curso_routes
 from App.Modulo_Cursos.config.database import engine, Base
+from App.Modulo_Cursos.middleware.error_middleware import ErrorMiddleware
+from fastapi.exceptions import RequestValidationError
+from App.Modulo_Cursos.exceptions import (
+    validation_exception_handler,
+    general_exception_handler
+)
+
 
 # 1. Crear las tablas en la base de datos
 # Esto asegura que SQLAlchemy reconozca las tablas definidas en los modelos
@@ -14,6 +21,17 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.add_exception_handler(
+    RequestValidationError,
+    validation_exception_handler
+)
+
+
+app.add_exception_handler(
+    Exception,
+    general_exception_handler
+)
+
 # 3. Configurar CORS 
 # Esto permite que el frontend (React, Vue o HTML) se comunique con el backend
 app.add_middleware(
@@ -22,6 +40,10 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"], # Permitir todos los métodos (GET, POST, etc)
     allow_headers=["*"],
+)
+
+app.add_middleware(
+    ErrorMiddleware
 )
 
 # 4. Incluir las rutas del Módulo de Cursos

@@ -78,3 +78,29 @@ def get_programaciones_por_curso(id_curso: int, db: Session = Depends(get_db)):
         "hora": p.hora.strftime("%H:%M") if p.hora else None,
         "cupos": p.cupos
     } for p in programaciones]
+
+@router.put("/{id_programacion}")
+def actualizar(
+    id_programacion:int,
+    data:ProgramacionBase,
+    db:Session = Depends(get_db)
+):
+
+    return curso_controller.actualizar_programacion(
+        db,
+        id_programacion,
+        data
+    )
+
+
+
+@router.delete("/{id_programacion}")
+def eliminar(
+    id_programacion:int,
+    db:Session = Depends(get_db)
+):
+
+    return curso_controller.eliminar_programacion(
+        db,
+        id_programacion
+    )
